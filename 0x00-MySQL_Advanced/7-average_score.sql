@@ -12,12 +12,12 @@ BEGIN
 	FROM corrections
 	WHERE corrections.user_id = user_id;
     SELECT COUNT(*)
-        INTO project_count
+        INTO projects_count
 	FROM corrections
 	WHERE corrections.user_id = user_id;
 
     UPDATE users
-        SET users.average_score = IF(project_count = 0, 0, total_score / project_count)
+        SET users.average_score = IF(projects_count = 0, 0, total_score / projects_count)
 	WHERE users.id = user_id;
 END //
 DELIMITER ;
