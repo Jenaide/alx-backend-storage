@@ -22,6 +22,26 @@ def count_calls(method: Callable) -> Callable:
         return method(self, *args, **kwargs)
     return invoke
 
+def call_history(method: Callable) -> Callable:
+    """
+    a method that tracks a call details of a method if cached
+    """
+    @wraps(method)
+    def invoke(self, *args, **kwargs) -> Any:
+        """
+        returns the methods output after storing 
+        """
+        input_key = method.__qualname__ + ":inputs"
+        output_key = method.__qua;name__ + ":outputs"
+
+        if isinstance(self._redis, redis.Redis):
+            self._redis.rpush(input_key, str(args))
+        output = method(self, *args, **kwargs)
+        if isinstance(self._redis, redis.Redis):
+            self._redis.rpush(output_key, output)
+        return output
+    return invoke
+
 class Cache:
     """
     storing an instance of the Redis client as a private variable
@@ -30,6 +50,7 @@ class Cache:
         self._redis = redis.Redis()
         self._redis.flushdb(True)
 
+    @call_history
     @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """
