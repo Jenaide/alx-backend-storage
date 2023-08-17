@@ -6,12 +6,8 @@ import redis
 import requests
 from typing import Callable
 from functools import wraps
+redis_inst = redis.Redis() # redis instance
 
-
-redis_inst = redis.Redis()
-"""
-redis instance
-"""
 
 
 def cacher(method: Callable) -> Callable:
@@ -39,3 +35,7 @@ def get_page(url: str) -> str:
     function that returns the content of a url after caching the request
     """
     return requests.get(url).text
+
+
+if __name__ == "__main__":
+    get_page("http://slowwly.robertomurray.co.uk")
