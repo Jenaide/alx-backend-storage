@@ -15,18 +15,17 @@ def cacher(method: Callable) -> Callable:
     caches the output data when fetched
     """
     @wraps(method)
-    def invoke(url) -> str:
+    def invoke(*args, **kwargs):
         """
         a wrapper function for caching the output
         """
+        url = args[0]
         redis_inst.incr(f'count:{url}')
-        results = redis_inst.get(f'result:{url}')
+        results = redis_inst.get(f'{url}')
         if results:
             return results.decode('utf-8')
-        results = method(url)
-        redis_inst.set(f'count:{url}', 0)
-        redis_inst.setex(f'result:{url}', 10, results)
-        return results
+        redis_inst.setex(f'{url}, 10, {method(url)}')
+        return method(*args, **kwargs)
     return invoke
 
 @cacher
