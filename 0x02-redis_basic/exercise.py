@@ -5,7 +5,19 @@ Created by Jenaide Sibolie
 import redis
 import uuid
 from typing import Union, Callable
+from functools import wraps
 
+
+def count_calls(method: Callable) -> Callable:
+    @wraps(method)
+    """
+    a method that tracks the number of calls made to the Cache class.
+    """
+    def wrap(self, *args, *kwargs):
+        key = method.__qualname__
+        self._redis.incr(key)
+        return method(self, *args, *kwargs)
+    return wrap
 
 class Cache:
     """
