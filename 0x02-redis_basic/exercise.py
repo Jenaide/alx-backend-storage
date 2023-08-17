@@ -13,7 +13,7 @@ def count_calls(method: Callable) -> Callable:
     """
     a method that tracks the number of calls made to the Cache class.
     """
-    def wrap(self, *args, **kwargs):
+    def wrap(self, *args, **kwargs) -> Any:
         key = method.__qualname__
         self._redis.incr(key)
         return method(self, *args, **kwargs)
