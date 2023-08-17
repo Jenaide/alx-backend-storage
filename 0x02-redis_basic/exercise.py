@@ -9,10 +9,10 @@ from functools import wraps
 
 
 def count_calls(method: Callable) -> Callable:
-    @wraps(method)
     """
     a method that tracks the number of calls made to the Cache class.
     """
+    @wraps(method)
     def invoke(self, *args, **kwargs) -> Any:
         """
         a method that invokde given method after incrementation is called
