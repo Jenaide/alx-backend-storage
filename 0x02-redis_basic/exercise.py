@@ -13,11 +13,14 @@ def count_calls(method: Callable) -> Callable:
     """
     a method that tracks the number of calls made to the Cache class.
     """
-    def wrap(self, *args, **kwargs) -> Any:
-        key = method.__qualname__
-        self._redis.incr(key)
+    def invoke(self, *args, **kwargs) -> Any:
+        """
+        a method that invokde given method after incrementation is called
+        """
+        if isinstance(self._redis, redis.Redis):
+            self._redis.incr(method.__qualname__)
         return method(self, *args, **kwargs)
-    return wrap
+    return invoke
 
 class Cache:
     """
