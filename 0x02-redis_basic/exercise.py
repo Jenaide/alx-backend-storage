@@ -42,6 +42,31 @@ def call_history(method: Callable) -> Callable:
         return output
     return invoke
 
+def reply(fn: Callable) -> None:
+    """
+    a function display the call history of the cache class
+    """
+    if fn is None or not hasattr(fn, '__self__'):
+        return
+    redis_store = getattr(fn.__self__, '_redis', None)
+    if not isinstance(redis_store, redis.Redis):
+        return
+    call_name = fn.__qualname__
+    input_key = '{}:inputs'.format(call_name)
+    output_key = '{}:outputs'.format(call_name)
+    store_call_count = 0
+    if redis_store.exists(call_name) != 0:
+        store_call_count = int(redis_store.get(call_name))
+    print('{} was called {} times:'.format(call_name, store_call_count))
+    call_inputs = redis_store.lrange(input_key, 0, -1)
+    call_outputs = redis_store.lrange(output_key, 0, -1)
+    for call_input, call_output in zip(call_inputs, call_outputs):
+        print('{}(*{}) -> {}'.format(
+            call_name,
+            call_input.decode("utf-8"),
+            call_output,
+        ))
+
 class Cache:
     """
     storing an instance of the Redis client as a private variable
