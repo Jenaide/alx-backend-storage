@@ -9,6 +9,9 @@ from functools import wraps
 
 
 redis_inst = redis.Redis()
+"""
+redis instance
+"""
 
 
 def cacher(method: Callable) -> Callable:
@@ -21,12 +24,12 @@ def cacher(method: Callable) -> Callable:
         a wrapper function for caching the output
         """
         redis_inst.incr(f'count:{url}')
-        results = redis_inst.get(f'results:{url}')
+        results = redis_inst.get(f'result:{url}')
         if results:
             return results.decode('utf-8')
         results = method(url)
         redis_inst.set(f'count:{url}', 0)
-        redis_inst.setex(f'results:{urls}', 10, results)
+        redis_inst.setex(f'result:{url}', 10, results)
         return results
     return invoke
 
